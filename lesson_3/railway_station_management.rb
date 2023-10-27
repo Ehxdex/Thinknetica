@@ -1,22 +1,23 @@
 class Station
-  attr_reader :trains, :station_name
-  def initialize(station_name)
-    @station_name = station_name
+  attr_reader :trains, :name
+
+  def initialize(name)
+    @name = name
   	@trains = []
   end
 
-  def arrival_of_train(train)
+  def arrival_train(train)
     @trains << train
   end
 
-  def departure_of_train(train)
+  def departure_train(train)
     @trains.delete(train)
   end
 
-  def show_trains_on_station_by_type(type)
+  def trains_by_type(type)
     count = 0
     @trains.each do |train|
-      if train.train_type == type
+      if train.type == type
         count += 1     
       end
     end
@@ -25,35 +26,31 @@ class Station
 end
 
 class Route
-  attr_reader :departure_station, :intermediate_stations, :terminal_station, :all_stations
-  def initialize(departure_station, terminal_station)
-    @departure_station = departure_station
-    @terminal_station = terminal_station
-    @intermediate_stations = []
-    @all_stations = []
+  attr_reader :first_station, :mid_stations, :last_station
+  
+  def initialize(first_station, last_station)
+    @first_station = first_station
+    @last_station = last_station
+    @mid_stations = []
   end
 
-  def add_route_station(station)
-    @intermediate_stations << station
+  def add_station(station)
+    @mid_stations << station
   end
 
-  def show_route_stations
-    @all_stations << @departure_station.station_name
-    @intermediate_stations.each {|station| @all_stations << station.station_name}
-    @all_stations << @terminal_station.station_name
-    return @all_stations
+  def stations
+    return [@first_station, @mid_stations, @last_station].flatten
   end
 end
 
 class Train
-  attr_accessor :number_of_carriages
-  attr_reader :train_type, :train_number, :current_station
+  attr_reader :number, :type, :wagons
 
-  def initialize(train_number, train_type, number_of_carriages)
-    @train_number = train_number
-    @train_type = train_type
-    @number_of_carriages = number_of_carriages
-    @current_station = ""
+  def initialize(number, type, wagons)
+    @number = number
+    @type = type
+    @wagons = wagons
+    @speed = 0
   end
 
   def acceleration(speed)
@@ -68,28 +65,47 @@ class Train
     @speed = 0
   end
 
-  def increase_number_of_carrieges
-    @number_of_carriages += 1 if @speed == 0
+  def increase_wagons
+    @wagons += 1 if @speed == 0
   end
 
-  def decrease_number_of_carrieges
-    @number_of_carriages -= 1 if @speed == 0
+  def decrease_wagons
+    @wagons -= 1 if @speed == 0
   end
 
-  def current_route(route)
-    @current_station = route.departure_station.station_name
-    return "Маршрут получен, вы на станции #{route.departure_station.station_name}"
+  def assign_route(route)
+    @route = route
+    @current_station_index = 0
+
+    current_station.arrival_train(self)
+    return "Маршрут получен, вы на станции #{current_station.name}"
   end
 
-  def next_station(route)
-    next_index = route.all_stations[0..-1].find_index(@current_station) + 1
-    @current_station = route.all_stations[next_index]
-    return @current_station
+  def current_station
+    @route.stations[@current_station_index]
   end
 
-  def previous_station(route)
-    previous_index = route.all_stations[0..-1].find_index(@current_station) - 1
-    @current_station = route.all_stations[previous_index]
-    return @current_station
+  def next_station
+    return unless @route
+    @route.stations[@current_station_index + 1]
+  end
+
+  def previous_station
+    return unless @route
+    @route.stations[@current_station_index + 1]
+  end
+
+  def move_next_station
+    return unless next_station
+    current_station.departure_train(self)
+    @current_station_index += 1
+    current_station.arrival_train(self)
+  end
+
+  def move_previous_station
+    return unless previous_station
+    current_station.departure_train(self)
+    @current_station_index -= 1
+    current_station.arrival_train(self)
   end
 end

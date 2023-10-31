@@ -1,10 +1,10 @@
 class Train
   attr_reader :number, :type, :wagons
 
-  def initialize(number, type, wagons)
+  def initialize(number, type = :passenger)
     @number = number
     @type = type
-    @wagons = wagons
+    puts @wagons = []
     @speed = 0
   end
 
@@ -20,12 +20,16 @@ class Train
     @speed = 0
   end
 
-  def increase_wagons
-    @wagons += 1 if @speed == 0
+  def add_wagon(wagon)
+    self.wagons.push(wagon) if @speed == 0
   end
 
-  def decrease_wagons
-    @wagons -= 1 if @speed == 0
+  def delete_wagon
+    self.wagons.pop() if @speed == 0
+  end
+
+  def wagons_count
+    return @wagons.size
   end
 
   def assign_route(route)

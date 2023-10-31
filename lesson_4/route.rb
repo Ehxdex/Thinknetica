@@ -11,6 +11,10 @@ class Route
     @mid_stations << station
   end
 
+  def delete_station(station)
+    @mid_stations.delete(station)
+  end
+
   def stations
     return [@first_station, @mid_stations, @last_station].flatten
   end

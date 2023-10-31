@@ -25,9 +25,8 @@ class Menu
     puts "11. Добавление станции к маршруту"
     puts "12. Удаление станции из маршрута"
     puts "----------- Управление -----------"
-    puts "13. Отправить поезд на первую станцию"
-    puts "14. Отправить поезд на след. станцию"
-    puts "15. Отправить поезд на пред. станцию"
+    puts "13. Отправить поезд на след. станцию"
+    puts "14. Отправить поезд на пред. станцию"
     puts "----------------------------------"
     puts "Для 'Выхода' нажмите любую клавишу."
     puts 
@@ -37,53 +36,23 @@ class Menu
     main_menu
   
     while  true do
+      main_menu
       user_input = gets.chomp.to_i
       case user_input
-      when 1
-        create_train
-        main_menu
-      when 2
-        create_station
-        main_menu
-      when 3
-        create_route
-        main_menu
-      when 4
-        show_trains
-        main_menu
-      when 5
-        show_stations
-        main_menu
-      when 6
-        show_routes
-        main_menu
-      when 7
-        show_trains_on_station
-        main_menu
-      when 8
-        add_wagon_to_train
-        main_menu
-      when 9
-        remove_wagons_of_train
-        main_menu
-      when 10
-        route_to_train
-        main_menu
-      when 11
-        add_station_to_route
-        main_menu
-      when 12
-        delete_station_from_route
-        main_menu
-      when 13
-        move_train_to_station
-        main_menu
-      when 14
-        train_move_next_station
-        main_menu
-      when 15
-        train_move_previous_station
-        main_menu
+      when 1 then create_train
+      when 2 then create_station
+      when 3 then create_route
+      when 4 then show_trains
+      when 5 then show_stations
+      when 6 then show_routes
+      when 7 then show_trains_on_station
+      when 8 then add_wagon_to_train
+      when 9 then remove_wagons_of_train
+      when 10 then add_route_to_train
+      when 11 then add_station_to_route
+      when 12 then delete_station_from_route
+      when 13 then train_move_next_station
+      when 14 then train_move_previous_station
       when 0
         break
       else
@@ -109,7 +78,7 @@ class Menu
     else
       puts "Такого типа поезда не существует."
     end
-    puts "Поезд создан"
+    puts "Поезд создан."
   end
 
   #2
@@ -118,37 +87,38 @@ class Menu
     station_name = gets.chomp.to_s.downcase
     station =  Station.new(station_name)
     @stations << station
-    puts "Станция создана."
+    puts "Станция #{station_name} создана."
   end
 
   #3
   def create_route
-    puts "Для создания маршрута укажите название станции отправления, остановок и станции прибытия"
+    puts "Для создания маршрута укажите индекс станции отправления и станции прибытия"
     puts 
-    puts "Список всех станций:"
-    @stations.each { |s| puts "Название станции: #{s.name}" }
+    show_stations
     puts 
-    puts "Введите станцию отправления"
-    first_station = gets.chomp.to_s
-    puts "Введите станцию прибытия"
-    last_station = gets.chomp.to_s
+    puts "Введите индекс станции отправления"
+    first_station = gets.chomp.to_i
+    puts "Введите индекс станции прибытия"
+    last_station = gets.chomp.to_i
 
-    route = Route.new(first_station,last_station) if @stations.include?(first_station) && @stations.include?(last_station)
+    route = Route.new(@stations[first_station], @stations[last_station])
+    @routes << route 
+    puts "Маршрут создан."
   end
 
   #4
   def show_trains
     puts "Список поездов:"
-    @trains.each { |train| puts "Номер поезда: #{train.number}, Тип поезда: #{train.type}, Количество вагонов: #{train.wagons_count}" }
+    @trains.each_with_index { |train, index| puts "#{index}. Номер поезда: #{train.number}, Тип поезда: #{train.type}, Количество вагонов: #{train.wagons_count}" }
   end
     
   def search_train
     show_trains
 
-    puts "Укажите номер поезда к которому хотите добавить вагон(ы)"
+    puts "Укажите индекс поезда:"
     @t_number = gets.chomp.to_i
 
-    puts "Количество вагонов которые хотите добавить?"
+    puts "Укажите количество вагонов:"
     @w_count = gets.chomp.to_i
   end 
 
@@ -156,30 +126,36 @@ class Menu
   def show_stations
     return unless @stations
     puts "Список станций:"
-    count = 0
-    @stations.each { |s| puts "#{count += 1}. Название станции: #{s.name}" }
+    @stations.each_with_index { |s, i| puts "#{i}. #{s.name}" }
   end
 
   #6
   def show_routes
-    @routes.each { |r| puts "Название станции: #{r}" }
+    puts "Доступны следующие маршруты: "
+    
+    @routes.each_with_index { |r, i| puts "#{i}. #{r.stations}" }
   end
 
   #7
-  def show_trains_on_station #to do
+  def show_trains_on_station
+    show_stations
+    puts "Введите индекс станции, чтобы просмотреть какие на ней поезда"
+    get_index = gets.chomp.to_i 
+    puts "На станции #{@stations[get_index].name} поезда:"
+    station = @stations[get_index].trains
+    station.each_with_index { |train, index| puts "#{index}. Номер поезда: #{train.number}, Тип поезда: #{train.type}, Количество вагонов: #{train.wagons_count}" }
   end
 
   #8
   def add_wagon_to_train
     search_train
     
-    @trains.each do |train|
-      if train.number == @t_number
-        @w_count.times { train.add_wagon(WagonPassenger.new) }
-      elsif train.number == @t_number
-        @w_count.times { train.add_wagon(WagonCargo.new) }
-      end
-    end      
+    train = @trains[t_index]
+    if train.type == :passenger
+      @w_count.times { train.add_wagon(WagonPassenger.new) }
+    else
+      @w_count.times { train.add_wagon(WagonCargo.new) }
+    end  
     puts "Вагон(ы) добавлен(ы)"
   end
 
@@ -187,42 +163,74 @@ class Menu
   def remove_wagons_of_train
     search_train
     
-    @trains.each do |train|
-      if train.number == @t_number 
-        @w_count.times { train.pop() }
-      elsif train.number == @t_number
-        @w_count.times { train.pop()}
-      end
-    end      
-    puts "Вагон(ы) добавлен(ы)"
+    train = @trains[t_index]
+    @w_count.times { train.pop() }
+   
+    puts "Вагон(ы) отцеплены(ы)"
   end
 
   #10 
-  def route_to_train # todo
+  def add_route_to_train # todo
+    puts "Выберите номер маршрута к которому хотите добавить поезд"
+    show_routes
+    r_number = gets.chomp.to_i
+    show_trains
+    puts "Укажите порядковый номер поезда который хотите добавить к маршруту"
+    t_number = gets.chomp.to_i
+
+    route = @routes[r_number]
+    train = @trains[t_number]
+    train.assign_route(route)
+
+    
+    puts "Маршрут получен, вы на станции #{route.first_station.name}"
   end
 
   #11
-  def add_station_to_route # todo
+  def add_station_to_route
+    puts "Выберите номер маршрута к которому хотите добавить станцию"
+    show_routes
+    user_input = gets.chomp.to_i
+    
+    puts "Напишите название станции: "
+    station_name = gets.chomp.to_s.downcase
+    @routes[user_input - 1].add_station(station_name)
+    puts "Станция #{station_name} добавлена"
   end
 
   #12
-  def delete_station_from_route #todo
+  def delete_station_from_route
+    puts "Выберите номер маршрута в котором хотите удалить станцию"
+    show_routes
+    user_input = gets.chomp.to_i
+    
+    puts "Напишите название станции:"
+    station_name = gets.chomp.to_s.downcase
+    @routes[user_input - 1].delete_station(station_name)
+    puts "Станция #{station_name} удалена"
   end
 
   #13
-  def move_train_to_station #todo
+  def train_move_next_station #todo
+    show_trains
+
+    puts "Укажите индекс поезда, который отправится на следующую станцию"
+    t_index = gets.chomp.to_i
+    train = @trains[t_index]
+    train.next_station
+    train.move_next_station
+    puts "Поезд отправился на следующую станцию"
   end
 
   #14
-  def train_move_next_station #todo
-  end
-
-  #15
   def train_move_previous_station #todo
+    show_trains
+
+    puts "Укажите номер поезда, который отправится на предыдущую станцию"
+    t_index = gets.chomp.to_i
+    train = @trains[t_index]
+    train.previous_station
+    train.move_previous_station
+    puts "Поезд отправился на следующую станцию"
   end
 end
-
-
-
-
-

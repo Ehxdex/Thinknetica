@@ -4,7 +4,7 @@ class Train
   def initialize(number, type = :passenger)
     @number = number
     @type = type
-    puts @wagons = []
+    @wagons = []
     @speed = 0
   end
 

@@ -1,4 +1,8 @@
+require_relative 'company'
+
 class Train
+  include CompanyName
+  
   attr_reader :number, :type, :wagons
 
   def initialize(number, type = :passenger)

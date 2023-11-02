@@ -1,12 +1,10 @@
 class Station
   attr_reader :trains, :name
 
-  @@station_object_count = 0
-
   def initialize(name)
     @name = name
   	@trains = []
-    @@station_object_count += 1
+    self.class.all << self
   end
 
   def arrival_train(train)
@@ -21,7 +19,7 @@ class Station
     @trains.each_with_object(Hash.new(0)) { |t, hh| hh[t.type] += 1 }
   end
 
-  def all
-    @@station_object_count
+  def self.all
+    @all ||= []
   end
 end

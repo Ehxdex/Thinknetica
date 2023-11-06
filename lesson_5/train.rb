@@ -1,15 +1,25 @@
 require_relative 'company'
+require_relative 'instance_counter'
 
 class Train
   include CompanyName
+  include InstanceCounter
   
   attr_reader :number, :type, :wagons
+
+  @@all_train = []
 
   def initialize(number, type = :passenger)
     @number = number
     @type = type
     @wagons = []
     @speed = 0
+    @@all_train << self
+    register_instance
+  end
+
+  def self.find(number)
+    @@all_train.each { |train| return train if train.number == number ? train : nil }
   end
 
   def acceleration(speed)

@@ -1,9 +1,11 @@
 require_relative 'company'
 require_relative 'instance_counter'
+require_relative 'validation'
 
 class Train
   include CompanyName
   include InstanceCounter
+  include Validation
   
   attr_reader :number, :type, :wagons
 
@@ -16,6 +18,7 @@ class Train
     @speed = 0
     @@all_train << self
     register_instance
+    validate!
   end
 
   def self.find(number)
@@ -80,5 +83,12 @@ class Train
     current_station.departure_train(self)
     @current_station_index -= 1
     current_station.arrival_train(self)
+  end
+
+  protected
+
+  def validate!
+    raise "The train type can be only 'passenger' or 'cargo'" unless @type == :passenger or @type == :cargo
+    raise "Invalid format number of the train, must be '111-SS'" if @number !~ /^\d{3}[\W.-][a-z]{2}$/i
   end
 end

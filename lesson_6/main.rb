@@ -8,6 +8,7 @@ require_relative 'wagon'
 require_relative 'wagon_passenger'
 require_relative 'wagon_cargo'
 require_relative 'company'
+require_relative 'validation'
 
 app = Menu.new
 app.start_application

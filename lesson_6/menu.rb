@@ -66,7 +66,7 @@ class Menu
   #1
   def create_train
     puts "Введите номер поезда"
-    number = gets.chomp.to_i
+    number = gets.chomp.to_s
     puts "Какой тип поезда вы хотите создать? 'p(passenger)' или 'c(cargo)'"
     train_type = gets.chomp.to_s
     if train_type == "p"
@@ -150,7 +150,7 @@ class Menu
   def add_wagon_to_train
     search_train
     
-    train = @trains[t_index]
+    train = @trains[@t_number]
     if train.type == :passenger
       @w_count.times { train.add_wagon(WagonPassenger.new) }
     else
@@ -163,7 +163,7 @@ class Menu
   def remove_wagons_of_train
     search_train
     
-    train = @trains[t_index]
+    train = @trains[@t_number]
     @w_count.times { train.pop() }
    
     puts "Вагон(ы) отцеплены(ы)"

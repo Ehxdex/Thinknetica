@@ -1,7 +1,9 @@
 require_relative 'instance_counter'
+require_relative 'validation'
 
 class Route
   include InstanceCounter
+  include Validation
 
   attr_reader :first_station, :mid_stations, :last_station
   
@@ -10,6 +12,7 @@ class Route
     @last_station = last_station
     @mid_stations = []
     register_instance
+    validate!
   end
 
   def add_station(station)
@@ -22,5 +25,12 @@ class Route
 
   def stations
     return [@first_station, @mid_stations, @last_station].flatten
+  end
+
+  protected
+
+  def validate!
+    raise "First or last stations can't be nil" if @first_station.nil? or @last_station.nil?
+    raise "First or last stations must be different" if @first_station.name == @last_station.name
   end
 end

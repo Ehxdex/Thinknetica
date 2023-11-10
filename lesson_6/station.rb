@@ -10,10 +10,10 @@ class Station
 
   def initialize(name)
     @name = name
+    validate!
   	@trains = []
     self.class.all << self
     register_instance
-    validate!
   end
 
   def arrival_train(train)
@@ -35,6 +35,7 @@ class Station
   protected
 
   def validate!
-		raise "Station can't be nil" if @name.nil?
+		raise ArgumentError, "Station name can't be nil" if @name.nil?
+    raise ArgumentError, "Station name can't be empty" if @name.empty?
   end
 end

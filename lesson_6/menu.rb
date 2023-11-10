@@ -72,13 +72,17 @@ class Menu
     if train_type == "p"
       train_passenger = TrainPassenger.new(number)
       @trains << train_passenger
+      puts "Пассажирский поезд создан."
     elsif train_type == "c"
       train_cargo = TrainCargo.new(number)
       @trains << train_cargo
+      puts "Грузовой поезд создан."
     else
-      puts "Такого типа поезда не существует."
+      puts "Такого типа поезда не существует. Повторите попытку."
     end
-    puts "Поезд создан."
+  rescue ArgumentError => e
+    puts e.message
+    retry
   end
 
   #2
@@ -88,6 +92,9 @@ class Menu
     station =  Station.new(station_name)
     @stations << station
     puts "Станция #{station_name} создана."
+  rescue ArgumentError => e
+    puts e.message
+    retry
   end
 
   #3
@@ -104,16 +111,21 @@ class Menu
     route = Route.new(@stations[first_station], @stations[last_station])
     @routes << route 
     puts "Маршрут создан."
+  rescue ArgumentError => e
+    puts e.message
+    retry
   end
 
   #4
   def show_trains
+    return puts "Поезда еще не созданы." if @trains.empty?
+
     puts "Список поездов:"
     @trains.each_with_index { |train, index| puts "#{index}. Номер поезда: #{train.number}, Тип поезда: #{train.type}, Количество вагонов: #{train.wagons_count}" }
   end
     
   def search_train
-    show_trains
+    return unless show_trains
 
     puts "Укажите индекс поезда:"
     @t_number = gets.chomp.to_i
@@ -124,44 +136,54 @@ class Menu
 
   #5
   def show_stations
-    return unless @stations
+    return puts "Станции еще не созданы." if @stations.empty?
+
     puts "Список станций:"
     @stations.each_with_index { |s, i| puts "#{i}. #{s.name}" }
   end
 
   #6
   def show_routes
+    return puts "Маршутов нет." if @routes.empty?
+
     puts "Доступны следующие маршруты: "
-    
-    @routes.each_with_index { |r, i| puts "#{i}. #{r.stations}" }
+    @routes.each_with_index {|r, i| puts "#{i}. #{r.stations}}" }
   end
 
   #7
   def show_trains_on_station
     show_stations
+    return unless @stations[0]
     puts "Введите индекс станции, чтобы просмотреть какие на ней поезда"
     get_index = gets.chomp.to_i 
-    puts "На станции #{@stations[get_index].name} поезда:"
+    puts "На станции #{@stations[get_index].name} поезда:" 
     station = @stations[get_index].trains
     station.each_with_index { |train, index| puts "#{index}. Номер поезда: #{train.number}, Тип поезда: #{train.type}, Количество вагонов: #{train.wagons_count}" }
   end
 
   #8
   def add_wagon_to_train
-    search_train
-    
+    return unless search_train
+
     train = @trains[@t_number]
     if train.type == :passenger
       @w_count.times { train.add_wagon(WagonPassenger.new) }
-    else
+      puts "Пассажирские вагон(ы) добавлен(ы)"
+    elsif train.type == :cargo
       @w_count.times { train.add_wagon(WagonCargo.new) }
+      puts "Грузовые вагон(ы) добавлен(ы)"
+    else
+      puts "Вы не ввели тип выгонов"
     end  
-    puts "Вагон(ы) добавлен(ы)"
+    
+  rescue ArgumentError => e
+    puts e.message
+    retry
   end
 
   #9
   def remove_wagons_of_train
-    search_train
+    return unless search_train
     
     train = @trains[@t_number]
     @w_count.times { train.pop() }
@@ -170,26 +192,25 @@ class Menu
   end
 
   #10 
-  def add_route_to_train # todo
+  def add_route_to_train
+    return unless show_routes
     puts "Выберите номер маршрута к которому хотите добавить поезд"
-    show_routes
     r_number = gets.chomp.to_i
-    show_trains
+    return unless show_trains
     puts "Укажите порядковый номер поезда который хотите добавить к маршруту"
     t_number = gets.chomp.to_i
-
+    
     route = @routes[r_number]
     train = @trains[t_number]
     train.assign_route(route)
-
-    
     puts "Маршрут получен, вы на станции #{route.first_station.name}"
   end
 
   #11
   def add_station_to_route
+    return unless show_routes
     puts "Выберите номер маршрута к которому хотите добавить станцию"
-    show_routes
+
     user_input = gets.chomp.to_i
     
     puts "Напишите название станции: "
@@ -200,6 +221,7 @@ class Menu
 
   #12
   def delete_station_from_route
+    return unless show_routes
     puts "Выберите номер маршрута в котором хотите удалить станцию"
     show_routes
     user_input = gets.chomp.to_i
@@ -212,7 +234,7 @@ class Menu
 
   #13
   def train_move_next_station #todo
-    show_trains
+    return unless show_trains
 
     puts "Укажите индекс поезда, который отправится на следующую станцию"
     t_index = gets.chomp.to_i
@@ -224,7 +246,7 @@ class Menu
 
   #14
   def train_move_previous_station #todo
-    show_trains
+    return unless show_trains
 
     puts "Укажите номер поезда, который отправится на предыдущую станцию"
     t_index = gets.chomp.to_i

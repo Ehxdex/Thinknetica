@@ -10,9 +10,9 @@ class Route
   def initialize(first_station, last_station)
     @first_station = first_station
     @last_station = last_station
+    validate!
     @mid_stations = []
     register_instance
-    validate!
   end
 
   def add_station(station)
@@ -30,7 +30,7 @@ class Route
   protected
 
   def validate!
-    raise "First or last stations can't be nil" if @first_station.nil? or @last_station.nil?
-    raise "First or last stations must be different" if @first_station.name == @last_station.name
+    raise ArgumentError, "Name first or last stations can't be nil" if @first_station.nil? or @last_station.nil?
+    raise ArgumentError, "Name first or last stations must be different" if @first_station.name == @last_station.name
   end
 end

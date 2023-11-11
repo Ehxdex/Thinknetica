@@ -88,9 +88,11 @@ class Train
   protected
 
   def validate!
-    raise ArgumentError, "The train type can't be nil" if @type.nil?
-    raise ArgumentError, "The train type can't be empty" if @type.empty?
-    raise ArgumentError, "The train type can be only 'passenger' or 'cargo'" unless @type == :passenger or @type == :cargo
-    raise ArgumentError, "Invalid format number of the train, must be '111-SS'" if @number !~ /^\d{3}[\W.-][a-z]{2}$/i
+    errors = []
+    errors << "The train type can't be nil" if @type.nil?
+    errors << "The train type can't be empty" if @type.empty?
+    errors << "The train type can be only 'passenger' or 'cargo'" unless @type == :passenger or @type == :cargo
+    errors << "Invalid format number of the train, must be '111-SS'" if @number !~ /^\d{3}[\W.-][a-z]{2}$/i
+    raise ArgumentError, errors.join(', ') unless errors.empty?
   end
 end

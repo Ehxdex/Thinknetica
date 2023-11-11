@@ -15,8 +15,10 @@ class Wagon
   protected
 
   def validate!
-    raise ArgumentError, "Wagon type can't be nil'" if @type.nil?
-    raise ArgumentError, "Wagon type can't be empty'" if @type.empty?
-    raise ArgumentError, "Wagon type can only be 'passenger' or 'cargo'" unless @type == :passenger or @type == :cargo
+    errors = []
+    errors << "Wagon type can't be nil'" if @type.nil?
+    errors << "Wagon type can't be empty'" if @type.empty?
+    errors << "Wagon type can only be 'passenger' or 'cargo'" unless @type == :passenger or @type == :cargo
+    raise ArgumentError, errors.join(', ') unless errors.empty?
   end
 end

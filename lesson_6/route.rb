@@ -30,7 +30,9 @@ class Route
   protected
 
   def validate!
-    raise ArgumentError, "Name first or last stations can't be nil" if @first_station.nil? or @last_station.nil?
-    raise ArgumentError, "Name first or last stations must be different" if @first_station.name == @last_station.name
+    errors = []
+    errors << "Name first or last stations can't be nil" if @first_station.nil? or @last_station.nil?
+    errors << "Name first or last stations must be different" if @first_station.name == @last_station.name
+    raise ArgumentError, errors.join(', ') unless errors.empty?
   end
 end

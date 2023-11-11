@@ -33,7 +33,7 @@ class Menu
   end
 
   def start_application
-    main_menu
+    # main_menu
   
     while  true do
       main_menu

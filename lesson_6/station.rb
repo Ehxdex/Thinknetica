@@ -35,7 +35,9 @@ class Station
   protected
 
   def validate!
-		raise ArgumentError, "Station name can't be nil" if @name.nil?
-    raise ArgumentError, "Station name can't be empty" if @name.empty?
+    errors = []
+		errors << "Station name can't be nil" if @name.nil?
+    errors <<  "Station name can't be empty" if @name.empty?
+    raise ArgumentError, errors.join(', ') unless errors.empty?
   end
 end

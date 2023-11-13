@@ -71,6 +71,7 @@ class Menu
     train_type = gets.chomp.to_s
     if train_type == "p"
       train_passenger = TrainPassenger.new(number)
+      train_passenger.sea
       @trains << train_passenger
       puts "Пассажирский поезд создан."
     elsif train_type == "c"

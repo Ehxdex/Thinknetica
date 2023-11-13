@@ -28,6 +28,10 @@ class Station
     @trains.each_with_object(Hash.new(0)) { |t, hh| hh[t.type] += 1 }
   end
 
+  def trains_info
+    @trains.each {|train| yield(train)}
+  end
+
   def self.all
     @all ||= []
   end

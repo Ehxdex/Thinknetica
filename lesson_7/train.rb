@@ -49,6 +49,10 @@ class Train
     return @wagons.size
   end
 
+  def wagons_info
+    @wagons.each {|wagon| yield(wagon)}
+  end 
+
   def assign_route(route)
     @route = route
     @current_station_index = 0

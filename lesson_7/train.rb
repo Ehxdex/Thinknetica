@@ -50,7 +50,10 @@ class Train
   end
 
   def wagons_info
-    @wagons.each {|wagon| yield(wagon)}
+    @wagons.each_with_index do |wagon, i| 
+  		puts "Вагон №#{i+1}"
+  		puts yield(wagon)
+  	end
   end 
 
   def assign_route(route)

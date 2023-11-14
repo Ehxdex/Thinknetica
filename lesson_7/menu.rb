@@ -27,6 +27,8 @@ class Menu
     puts "----------- Управление -----------"
     puts "13. Отправить поезд на след. станцию"
     puts "14. Отправить поезд на пред. станцию"
+    puts "15. Приобретение билетов"
+    puts "16. Загрузка вагонов"
     puts "----------------------------------"
     puts "Для 'Выхода' нажмите любую клавишу."
     puts 
@@ -53,6 +55,8 @@ class Menu
       when 12 then delete_station_from_route
       when 13 then train_move_next_station
       when 14 then train_move_previous_station
+      when 15 then buy_tickets
+      when 16 then fill_cargo_wagons
       when 0
         break
       else
@@ -71,7 +75,7 @@ class Menu
     train_type = gets.chomp.to_s
     if train_type == "p"
       train_passenger = TrainPassenger.new(number)
-      train_passenger.sea
+      
       @trains << train_passenger
       puts "Пассажирский поезд создан."
     elsif train_type == "c"
@@ -130,9 +134,6 @@ class Menu
 
     puts "Укажите индекс поезда:"
     @t_number = gets.chomp.to_i
-
-    puts "Укажите количество вагонов:"
-    @w_count = gets.chomp.to_i
   end 
 
   #5
@@ -159,7 +160,15 @@ class Menu
     get_index = gets.chomp.to_i 
     puts "На станции #{@stations[get_index].name} поезда:" 
     station = @stations[get_index].trains
-    station.each_with_index { |train, index| puts "#{index}. Номер поезда: #{train.number}, Тип поезда: #{train.type}, Количество вагонов: #{train.wagons_count}" }
+    station.each_with_index do |train, index|
+      puts "#{index}. Номер поезда: #{train.number}, Тип поезда: #{train.type}, Количество вагонов: #{train.wagons_count}"
+      train = @trains[index]
+      if train.type = :passenger
+        train.wagons_info { |wag| puts "  Тип вагона: #{wag.type}, Количество мест: #{wag.seats}, Количеcтво свободных мест: #{wag.free_seats}" }
+      elsif train_type == :cargo
+        train.wagons_info { |wag| puts "  Тип вагона: #{wag.type}, объем: #{wag.volume}, Свободное пространство: #{wag.free_volume}" }
+      end
+    end
   end
 
   #8
@@ -167,12 +176,18 @@ class Menu
     return unless search_train
 
     train = @trains[@t_number]
+    puts "Укажите количество вагонов:"
+    @w_count = gets.chomp.to_i
     if train.type == :passenger
-      @w_count.times { train.add_wagon(WagonPassenger.new) }
-      puts "Пассажирские вагон(ы) добавлен(ы)"
+      puts "Укажите количество сидений в вагоне: "
+      seats_count = gets.chomp.to_i
+      @w_count.times { train.add_wagon(WagonPassenger.new(seats_count)) }
+      puts "Пассажирские вагон(ы) добавлен(ы), с количеством мест: #{seats_count}"
     elsif train.type == :cargo
-      @w_count.times { train.add_wagon(WagonCargo.new) }
-      puts "Грузовые вагон(ы) добавлен(ы)"
+      puts "Укажите объем грузового вагона: "
+      volume_count = gets.chomp.to_i
+      @w_count.times { train.add_wagon(WagonCargo.new(volume_count)) }
+      puts "Грузовые вагон(ы) добавлен(ы), с объемом для загрузки #{volume_count}"
     else
       puts "Вы не ввели тип выгонов"
     end  
@@ -234,7 +249,7 @@ class Menu
   end
 
   #13
-  def train_move_next_station #todo
+  def train_move_next_station
     return unless show_trains
 
     puts "Укажите индекс поезда, который отправится на следующую станцию"
@@ -246,7 +261,7 @@ class Menu
   end
 
   #14
-  def train_move_previous_station #todo
+  def train_move_previous_station
     return unless show_trains
 
     puts "Укажите номер поезда, который отправится на предыдущую станцию"
@@ -256,4 +271,62 @@ class Menu
     train.move_previous_station
     puts "Поезд отправился на следующую станцию"
   end
+
+  # 15
+  def buy_tickets
+    search_train
+    train = @trains[@t_number]
+    return puts "Невозможно купит билет, поезд грузовой" unless train.type == :passenger
+    puts "--------- Информация о поезде ----------"
+    puts "Номер поезда: #{train.number}"
+    puts "Тип поезда: #{train.type}"
+    puts "Количество вагонов в поезде: #{train.wagons_count}"
+    puts "--------- Информация о вагонах ---------"
+    train.wagons_info do |wag|
+      puts "_______________________________________________"
+      puts "  Тип вагона: #{wag.type}, Количество мест: #{wag.seats} "
+      puts "  Количеcтво свободных мест: #{wag.free_seats}   " 
+      puts "_______________________________________________"
+    end
+
+    puts "Укажите номер вагона в котором хотите купить билет"
+    w_number = gets.chomp.to_i
+    wagon = train.wagons[w_number - 1]
+
+    wagon.fill_wagon
+    puts "Билет приобретен вагоне №#{w_number}"
+  end
+
+  # 16
+  def fill_cargo_wagons
+    search_train
+    train = @trains[@t_number]
+    return puts "Невозможно загрузить, поезд пассажирский" unless train.type == :cargo
+
+    puts "--------- Информация о поезде ----------"
+    puts "Номер поезда: #{train.number}"
+    puts "Тип поезда: #{train.type}"
+    puts "Количество вагонов в поезде: #{train.wagons_count}"
+    puts "--------- Информация о вагонах ---------"
+    train.wagons_info do |wag|
+      puts "_______________________________________________"
+      puts "  Тип вагона: #{wag.type}, объем: #{wag.volume} "
+      puts "  Свободное пространство: #{wag.free_volume}   " 
+      puts "_______________________________________________"
+    end
+
+    puts "Укажите номер вагона к загрузке"
+    w_number = gets.chomp.to_i
+    wagon = train.wagons[w_number - 1]
+
+    puts "Укажите объем"
+    w_volume = gets.chomp.to_i
+    wagon.fill_volume(w_volume)
+    puts "Вы загрузили вагон №#{w_number}"
+    puts "Свободное пространство #{wagon.free_volume}"
+  end
 end
+
+
+
+

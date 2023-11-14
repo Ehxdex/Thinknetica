@@ -1,4 +1,6 @@
 class WagonCargo < Wagon
+  attr_reader :volume
+
   def initialize(volume)
     @volume = volume
     @filled = 0
@@ -24,7 +26,7 @@ class WagonCargo < Wagon
     errors = []
     errors << "Wagons volume can't be < 0" if @volume < 0
     errors << "Wagons volume can't be nil" if @volume.nil?
-    errors << "Used volume can't be more than wagons volume" if @used_volume > @volume
-    raise ArgumentErrors, errors.join(', ') unless errors.empty?) 
+    errors << "Used volume can't be more than wagons volume" if @filled > @volume
+    raise ArgumentErrors, errors.join(', ') unless errors.empty?
   end
 end

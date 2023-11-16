@@ -1,7 +1,6 @@
 require_relative 'instance_counter'
 require_relative 'validation'
 
-
 class Station
   include InstanceCounter
   include Validation
@@ -11,7 +10,7 @@ class Station
   def initialize(name)
     @name = name
     validate!
-  	@trains = []
+    @trains = []
     self.class.all << self
     register_instance
   end
@@ -23,13 +22,13 @@ class Station
   def departure_train(train)
     @trains.delete(train)
   end
-  
+
   def trains_by_type
     @trains.each_with_object(Hash.new(0)) { |t, hh| hh[t.type] += 1 }
   end
 
   def trains_info
-    @trains.each {|train| yield(train)}
+    @trains.each { |train| yield(train) }
   end
 
   def self.all
@@ -40,8 +39,8 @@ class Station
 
   def validate!
     errors = []
-		errors << "Station name can't be nil" if @name.nil?
-    errors <<  "Station name can't be empty" if @name.empty?
+    errors << "Station name can't be nil" if @name.nil?
+    errors << "Station name can't be empty" if @name.empty?
     raise ArgumentError, errors.join(', ') unless errors.empty?
   end
 end

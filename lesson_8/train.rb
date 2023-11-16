@@ -6,7 +6,7 @@ class Train
   include CompanyName
   include InstanceCounter
   include Validation
-  
+
   attr_reader :number, :type, :wagons
 
   @@all_train = []
@@ -22,7 +22,7 @@ class Train
   end
 
   def self.find(number)
-    @@all_train.each { |train| return train if train.number == number ? train : nil }
+    @@all_train.each { |train| train if train.number == number ? train : nil }
   end
 
   def acceleration(speed)
@@ -30,7 +30,7 @@ class Train
   end
 
   def current_speed
-    return @speed
+    @speed
   end
 
   def braking
@@ -38,30 +38,30 @@ class Train
   end
 
   def add_wagon(wagon)
-    self.wagons.push(wagon) if @speed == 0
+    wagons.push(wagon) if @speed.zero?
   end
 
   def delete_wagon
-    self.wagons.pop() if @speed == 0
+    wagons.pop if @speed.zero?
   end
 
   def wagons_count
-    return @wagons.size
+    @wagons.size
   end
 
   def wagons_info
-    @wagons.each_with_index do |wagon, i| 
-  		puts "Вагон №#{i+1}"
-  		puts yield(wagon)
-  	end
-  end 
+    @wagons.each_with_index do |wagon, i|
+      puts "Вагон №#{i + 1}"
+      puts yield(wagon)
+    end
+  end
 
   def assign_route(route)
     @route = route
     @current_station_index = 0
 
     current_station.arrival_train(self)
-    return "Маршрут получен, вы на станции #{current_station.name}"
+    "Маршрут получен, вы на станции #{current_station.name}"
   end
 
   def current_station
@@ -70,16 +70,19 @@ class Train
 
   def next_station
     return unless @route
+
     @route.stations[@current_station_index + 1]
   end
 
   def previous_station
     return unless @route
+
     @route.stations[@current_station_index + 1]
   end
 
   def move_next_station
     return unless next_station
+
     current_station.departure_train(self)
     @current_station_index += 1
     current_station.arrival_train(self)
@@ -87,6 +90,7 @@ class Train
 
   def move_previous_station
     return unless previous_station
+
     current_station.departure_train(self)
     @current_station_index -= 1
     current_station.arrival_train(self)
@@ -98,7 +102,7 @@ class Train
     errors = []
     errors << "The train type can't be nil" if @type.nil?
     errors << "The train type can't be empty" if @type.empty?
-    errors << "The train type can be only 'passenger' or 'cargo'" unless @type == :passenger or @type == :cargo
+    errors << "The train type can be only 'passenger' or 'cargo'" unless @type == :passenger || @type == :cargo
     errors << "Invalid format number of the train, must be '111-SS'" if @number !~ /^\d{3}[\W.-][a-z]{2}$/i
     raise ArgumentError, errors.join(', ') unless errors.empty?
   end

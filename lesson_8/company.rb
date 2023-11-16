@@ -4,9 +4,10 @@ module CompanyName
   end
 
   def company_info
-    self.company_name
+    company_name
   end
 
   private
+
   attr_accessor :company_name
 end

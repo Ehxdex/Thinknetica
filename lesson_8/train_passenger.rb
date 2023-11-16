@@ -4,7 +4,8 @@ class TrainPassenger < Train
   end
 
   def add_wagon(wagon)
-    return unless self.type == wagon.type
+    return unless type == wagon.type
+
     super(wagon)
   end
 end

@@ -9,7 +9,7 @@ class WagonCargo < Wagon
   end
 
   def fill_volume(fill)
-    free_volume - fill < 0 ? "Недостаточно объема" : @filled += fill
+    (free_volume - fill).negative? ? 'Недостаточно объема' : @filled += fill
   end
 
   def used_volume
@@ -24,7 +24,7 @@ class WagonCargo < Wagon
 
   def validate!
     errors = []
-    errors << "Wagons volume can't be < 0" if @volume < 0
+    errors << "Wagons volume can't be < 0" if @volume.negative?
     errors << "Wagons volume can't be nil" if @volume.nil?
     errors << "Used volume can't be more than wagons volume" if @filled > @volume
     raise ArgumentErrors, errors.join(', ') unless errors.empty?

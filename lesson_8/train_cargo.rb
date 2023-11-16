@@ -4,7 +4,8 @@ class TrainCargo < Train
   end
 
   def add_wagon(wagon)
-    return unless self.type == wagon.type
-    super(wagon)    
+    return unless type == wagon.type
+
+    super(wagon)
   end
 end

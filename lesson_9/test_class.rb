@@ -17,8 +17,26 @@ class Station
   extend Validation
 
   attr_accessor :name, :number, :station
-  
-  validate :name, :presence
-  validate :number, :format, /A-Z{0,3}/
-  validate :name, :type, :String
 end
+
+x = X.new
+s = Station.new
+
+s.name = "asd"
+Station.validate(s.name, :presence)
+puts Station.validate!
+puts Station.valid?
+
+s.number = "A"
+puts Station.validate(s.number, :format, /A/)
+puts Station.validate!
+puts Station.valid?
+
+s.number = "A-Z"
+puts Station.validate(s.number, :format, /A-Z{0,3}/)
+puts Station.validate!
+puts Station.valid?
+
+Station.validate(s, :type, Station)
+puts Station.validate!
+puts Station.valid?

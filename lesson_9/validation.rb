@@ -6,12 +6,12 @@ module Validation
   def validate!
     case @validations[:type]
     when :presence
-      raise 'Value must to be presence' if @validations[:name].nil?
+      raise "Value can't be nil" if @validations[:name].nil?
       raise "Value can't be empty" if @validations[:name] == ''
     when :format
       raise 'Invalid format' if @validations[:name] !~ @validations[:args]
     when :type
-      raise 'Invalid type' if @validations[:name].class != @validations[:args]
+      raise 'Invalid type' unless @validations[:name].is_a?(@validations[:args])
     end
   end
 
